@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
         post(data);
         return false;
     };
+
+    // Default page to be shown
+    load_posts();
 });
 
 function post(data) {
@@ -42,4 +45,28 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+function load_posts(user_id) {
+
+    if (user_id === undefined) {user_id = 0};
+
+    fetch(`/posts/user/${user_id}`)
+    .then(response => response.json())
+    .then(posts => {
+  
+      posts.forEach(contents => {
+        const post = document.createElement('div');
+        post.style = 'border: solid; border-width: 0.5px; margin: -0.5px 0px -0.5px 0px;';
+  
+        post.innerHTML = `By: ${contents.owner_name}, ${contents.content}, ` +
+                        `${contents.timestamp}, likes: ${contents.likes}`;
+  
+        document.querySelector('#posts-view').append(post);
+      });
+
+      // Print posts
+      console.log(posts);
+  
+    })
 }

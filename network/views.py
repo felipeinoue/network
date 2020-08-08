@@ -110,7 +110,7 @@ def post(request, post_id):
         }, status=400)
 
 @login_required
-def load_posts(request, user_id):
+def get_posts(request, user_id):
 
     # Get all the posts
     if user_id == 0:
@@ -122,5 +122,5 @@ def load_posts(request, user_id):
         return JsonResponse({"error": "Invalid mailbox."}, status=400)
 
     # Return posts in reverse chronologial order
-    post = posts.order_by("-timestamp").all()
+    posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
