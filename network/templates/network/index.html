@@ -1,0 +1,19 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    
+<form id="newpost-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <p>New Post</p>
+        <textarea class="form-control" id="newpost-content" rows="3"></textarea>
+    </div>
+    <button type="submit">Post</button>
+</form>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/network.js' %}"></script>
+{% endblock %}
