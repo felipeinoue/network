@@ -70,3 +70,4 @@ function load_posts(user_id) {
   
     })
 }
+export default load_posts(user_id);

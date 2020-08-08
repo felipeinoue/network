@@ -1,0 +1,20 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<div id="name-view">
+    <p>This is the Profile Page of {{ first_name }}</p>
+    <p>Following: {{ following }}</p>
+    <p>Followed by: {{ followed_by }}</p>
+</div>
+
+<div id="posts-view">
+    <p>Posts</p>
+</div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/profile.js' %}"></script>
+{% endblock %}

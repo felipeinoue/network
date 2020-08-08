@@ -124,3 +124,35 @@ def get_posts(request, user_id):
     # Return posts in reverse chronologial order
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+def profile(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+        user_dic = []
+        user_dic.append(user.serialize())
+        return render(request, "network/profile.html", {
+            "first_name": user_dic[0]['first_name'],
+            "following": user_dic[0]['following'],
+            "followed_by": user_dic[0]['followed_by']
+        })
+    except:
+        return HttpResponse('Error: Profile doesnt exist.')
+
+@login_required
+def get_profile(request, user_id):
+
+    # Query for requested profile
+    try:
+        profile = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "Profile not found."}, status=404)
+
+    # Return profile contents
+    if request.method == "GET":
+        return JsonResponse(profile.serialize())
+
+    # Profile must be via GET or PUT
+    else:
+        return JsonResponse({
+            "error": "GET or PUT request required."
+        }, status=400)
