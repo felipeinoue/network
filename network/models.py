@@ -5,14 +5,22 @@ from django.db import models
 class User(AbstractUser):
     
     def serialize(self):
-        following = Follow.objects.filter(follower=self.id).count()
-        followed_by = Follow.objects.filter(followed=self.id).count()
+        followers = Follow.objects.filter(followed=self.id)
+        list_followers = []
+        for follower in followers:
+            list_followers.append(follower.follower.id)
+
+        following = Follow.objects.filter(follower=self.id)
+        list_following = []
+        for follow in following:
+            list_following.append(follow.followed.id)
+
         return {
             "id": self.id,
             "username": self.username,
             "first_name": self.first_name,
-            "following": following,
-            "followed_by": followed_by
+            "followers": list_followers,
+            "following": list_following
         }
 
 class Post(models.Model):

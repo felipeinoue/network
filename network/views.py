@@ -109,7 +109,6 @@ def post(request, post_id):
             "error": "GET or PUT request required."
         }, status=400)
 
-@login_required
 def get_posts(request, user_id):
 
     # Get all the posts
@@ -119,7 +118,7 @@ def get_posts(request, user_id):
     elif user_id != 0:
         posts = Post.objects.filter(owner=user_id)
     else:
-        return JsonResponse({"error": "Invalid mailbox."}, status=400)
+        return JsonResponse({"error": "Invalid user id."}, status=400)
 
     # Return posts in reverse chronologial order
     posts = posts.order_by("-timestamp").all()
@@ -132,13 +131,12 @@ def profile(request, user_id):
         user_dic.append(user.serialize())
         return render(request, "network/profile.html", {
             "first_name": user_dic[0]['first_name'],
-            "following": user_dic[0]['following'],
-            "followed_by": user_dic[0]['followed_by']
+            "following_count": len(user_dic[0]['following']),
+            "followers_count": len(user_dic[0]['followers'])
         })
     except:
         return HttpResponse('Error: Profile doesnt exist.')
 
-@login_required
 def get_profile(request, user_id):
 
     # Query for requested profile
@@ -149,10 +147,47 @@ def get_profile(request, user_id):
 
     # Return profile contents
     if request.method == "GET":
-        return JsonResponse(profile.serialize())
+        return JsonResponse(profile.serialize(), status=200)
 
     # Profile must be via GET or PUT
     else:
         return JsonResponse({
             "error": "GET or PUT request required."
         }, status=400)
+
+def getUserID(request):
+    if request.user.is_authenticated:
+        return JsonResponse({"id": request.user.id}, status=200)
+    else:
+        return JsonResponse({"error": "user not found."}, status=404)
+
+@login_required
+def follow(request):
+    data = json.loads(request.body)
+
+    if request.method == "POST":
+        try:
+            follow = Follow.objects.get(
+                follower=data.get("follower"), 
+                followed=data.get("followed")
+            )
+            return JsonResponse({"message": "Can not follow. User is already following this profile."}, status=400)
+        except:
+            follower = User.objects.get(pk=data.get("follower"))
+            followed = User.objects.get(pk=data.get("followed"))
+            follow = Follow(
+                follower=follower,
+                followed=followed
+            )
+            follow.save()
+            return JsonResponse({"message": "Following action done successfully."}, status=201)
+    elif request.method == "DELETE":
+        try:
+            follow = Follow.objects.get(
+                follower=data.get("follower"), 
+                followed=data.get("followed")
+            )
+            follow.delete()
+            return JsonResponse({"message": "Stop following action done successfully."}, status=201)
+        except:
+            return JsonResponse({"message": "Can not stop following. User is not following this profile."}, status=400)

@@ -5,8 +5,11 @@
 
 <div id="name-view">
     <p>This is the Profile Page of {{ first_name }}</p>
-    <p>Following: {{ following }}</p>
-    <p>Followed by: {{ followed_by }}</p>
+    <p>Following: {{ following_count }}</p>
+    <p>Followers: {{ followers_count }}</p>
+    {% if user.is_authenticated %}
+    <button id="follow-btn"></button>
+    {% endif %}
 </div>
 
 <div id="posts-view">
@@ -17,4 +20,5 @@
 
 {% block script %}
     <script src="{% static 'network/profile.js' %}"></script>
+    <script src="{% static 'network/lib.js' %}"></script>
 {% endblock %}
