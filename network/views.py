@@ -200,5 +200,9 @@ def follow(request):
             return JsonResponse({"message": "Can not stop following. User is not following this profile."}, status=400)
 
 
+@login_required
 def following(request):
-    return render(request, "network/following.html")
+    user = User.objects.get(pk=request.user.id).serialize()
+    return render(request, "network/following.html", {
+        "user_json": user
+    })
