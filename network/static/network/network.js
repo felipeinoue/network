@@ -29,4 +29,4 @@ function post(data) {
         // Print result
         console.log(result);
     })    
-  }
+}

@@ -65,6 +65,7 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
+
 @login_required
 def newpost(request):
 
@@ -90,6 +91,7 @@ def newpost(request):
 
     return JsonResponse({"message": "Post saved successfully."}, status=201)
 
+
 @login_required
 def post(request, post_id):
 
@@ -109,6 +111,7 @@ def post(request, post_id):
             "error": "GET or PUT request required."
         }, status=400)
 
+
 def get_posts(request, user_id):
 
     # Get all the posts
@@ -124,6 +127,7 @@ def get_posts(request, user_id):
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+
 def profile(request, user_id):
     try:
         user = User.objects.get(pk=user_id)
@@ -136,6 +140,7 @@ def profile(request, user_id):
         })
     except:
         return HttpResponse('Error: Profile doesnt exist.')
+
 
 def get_profile(request, user_id):
 
@@ -155,11 +160,13 @@ def get_profile(request, user_id):
             "error": "GET or PUT request required."
         }, status=400)
 
+
 def getUserID(request):
     if request.user.is_authenticated:
         return JsonResponse({"id": request.user.id}, status=200)
     else:
         return JsonResponse({"error": "user not found."}, status=404)
+
 
 @login_required
 def follow(request):
@@ -191,3 +198,7 @@ def follow(request):
             return JsonResponse({"message": "Stop following action done successfully."}, status=201)
         except:
             return JsonResponse({"message": "Can not stop following. User is not following this profile."}, status=400)
+
+
+def following(request):
+    return render(request, "network/following.html")
