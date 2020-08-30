@@ -1,3 +1,4 @@
+let Fpage = 1;
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -5,17 +6,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('#newpost-form').onsubmit = () => {
             const data = document.querySelector('#newpost-content');
             post(data);
-            // return false; está comentado para forçar a página a recarregar
+            // return false; // está comentado para forçar a página a recarregar
         };    
     }
 
     catch(err) {
-        console.log('User not authenticated.')
+        console.log('User is not authenticated.')
         console.log(err.message)
     }
 
     // Default page to be shown
-    load_posts();
+    load_posts(1, 'all', Fpage);
 });
 
 function post(data) {

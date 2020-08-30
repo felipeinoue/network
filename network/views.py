@@ -6,12 +6,14 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
 from .models import User, Follow, Like, Post
 
 
 def index(request):
-    return render(request, "network/index.html")
+    return render(request, "network/index.html"
+    )
 
 
 def login_view(request):
@@ -115,16 +117,29 @@ def post(request, post_id):
 def get_posts(request, user_id):
 
     # Get all the posts
-    if user_id == 0:
-        posts = Post.objects.all()
-    # Filter posts returned by user
-    elif user_id != 0:
+    if request.GET.get("method") == "all":
+        page_num = request.GET.get("page")
+
+        objects = Post.objects.all()
+        objects = objects.order_by("-timestamp").all()
+        p = Paginator(objects, 10)
+        posts = p.page(page_num).object_list
+    # Filter posts returned by user profile
+    elif request.GET.get("method") == "profile":
         posts = Post.objects.filter(owner=user_id)
+    # Filter posts returned by user following
+    elif request.GET.get("method") == "following":
+        ls = []
+        user = User.objects.get(pk=user_id).serialize()
+        for follow in user['following']:
+            ls.append(follow)
+        
+        posts = Post.objects.filter(owner__in=ls)
+        posts = posts.order_by("-timestamp").all()
     else:
         return JsonResponse({"error": "Invalid user id."}, status=400)
 
     # Return posts in reverse chronologial order
-    posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 

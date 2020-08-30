@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     catch{}
     
     // Default page to be shown
-    load_posts(profile_id);
+    load_posts(profile_id, 'profile');
     loadFollowbtn(profile_id)
 });
 

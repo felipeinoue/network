@@ -1,14 +1,18 @@
-function load_posts(user_id) {
+function load_posts(user_id, Amethod, APage) {
+    let url = new URL(`${window.location.origin}/posts/user/${user_id}`)
+    url.search = new URLSearchParams({
+        method: Amethod,
+        page: APage
+    })
 
-    if (user_id === undefined) {user_id = 0};
-
-    fetch(`/posts/user/${user_id}`)
+    fetch(url)
     .then(response => response.json())
     .then(posts => {
   
       posts.forEach(contents => {
         const post = document.createElement('div');
         post.style = 'border: solid; border-width: 0.5px; margin: -0.5px 0px -0.5px 0px;';
+        post.className = 'post';
   
         post.innerHTML = `By: ${contents.owner_name}, ${contents.content}, ` +
                         `${contents.timestamp}, likes: ${contents.likes}`;
@@ -16,6 +20,34 @@ function load_posts(user_id) {
         document.querySelector('#posts-view').append(post);
       });
     })
+
+    // Check Previous and Next button behavior
+    const element_previous = document.getElementById('previous');
+    const element_next = document.getElementById('next');
+    if (Fpage === 1) {
+      element_previous.parentElement.className = 'page-item disabled';;
+    } else {
+      element_previous.parentElement.className = 'page-item';;
+    }
+    if (Fpage < 2) {
+      element_next.parentElement.className = 'page-item';;
+    } else {
+      element_next.parentElement.className = 'page-item disabled';;
+    }
+}
+
+function pagination(Anum) {
+  clean_posts();
+  Fpage = Fpage + (Anum);
+  load_posts(1, 'all', Fpage)
+}
+
+function clean_posts() {
+  let paras = document.getElementsByClassName('post');
+
+  while (paras[0]) {
+    paras[0].parentNode.removeChild(paras[0])
+  }
 }
 
 function getCookie(name) {
