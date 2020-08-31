@@ -1,3 +1,5 @@
+let Fpage = 1;
+
 function load_posts(user_id, Amethod, APage) {
     let url = new URL(`${window.location.origin}/posts/user/${user_id}`)
     url.search = new URLSearchParams({
@@ -38,8 +40,11 @@ function load_posts(user_id, Amethod, APage) {
 
 function pagination(Anum) {
   clean_posts();
+
   Fpage = Fpage + (Anum);
-  load_posts(1, 'all', Fpage)
+  const actual_page = JSON.parse(document.getElementById('actual_page').textContent);
+  const user_json = JSON.parse(document.getElementById('user-data').textContent);
+  load_posts(user_json['id'], actual_page, Fpage)
 }
 
 function clean_posts() {

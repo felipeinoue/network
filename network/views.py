@@ -12,8 +12,11 @@ from .models import User, Follow, Like, Post
 
 
 def index(request):
-    return render(request, "network/index.html"
-    )
+    user = User.objects.get(pk=request.user.id).serialize()
+    return render(request, "network/index.html", {
+        "user_json": user,
+        "actual_page": 'all'
+    })
 
 
 def login_view(request):
@@ -118,15 +121,10 @@ def get_posts(request, user_id):
 
     # Get all the posts
     if request.GET.get("method") == "all":
-        page_num = request.GET.get("page")
-
         objects = Post.objects.all()
-        objects = objects.order_by("-timestamp").all()
-        p = Paginator(objects, 10)
-        posts = p.page(page_num).object_list
     # Filter posts returned by user profile
     elif request.GET.get("method") == "profile":
-        posts = Post.objects.filter(owner=user_id)
+        objects = Post.objects.filter(owner=user_id)
     # Filter posts returned by user following
     elif request.GET.get("method") == "following":
         ls = []
@@ -134,10 +132,13 @@ def get_posts(request, user_id):
         for follow in user['following']:
             ls.append(follow)
         
-        posts = Post.objects.filter(owner__in=ls)
-        posts = posts.order_by("-timestamp").all()
+        objects = Post.objects.filter(owner__in=ls)
     else:
         return JsonResponse({"error": "Invalid user id."}, status=400)
+
+    objects = objects.order_by("-timestamp").all()
+    p = Paginator(objects, 10)
+    posts = p.page(request.GET.get("page")).object_list
 
     # Return posts in reverse chronologial order
     return JsonResponse([post.serialize() for post in posts], safe=False)
@@ -145,13 +146,16 @@ def get_posts(request, user_id):
 
 def profile(request, user_id):
     try:
+        user_json = User.objects.get(pk=request.user.id).serialize()
         user = User.objects.get(pk=user_id)
         user_dic = []
         user_dic.append(user.serialize())
         return render(request, "network/profile.html", {
+            "user_json": user_json,
             "first_name": user_dic[0]['first_name'],
             "following_count": len(user_dic[0]['following']),
-            "followers_count": len(user_dic[0]['followers'])
+            "followers_count": len(user_dic[0]['followers']),
+            "actual_page": 'profile'
         })
     except:
         return HttpResponse('Error: Profile doesnt exist.')
@@ -219,5 +223,6 @@ def follow(request):
 def following(request):
     user = User.objects.get(pk=request.user.id).serialize()
     return render(request, "network/following.html", {
-        "user_json": user
+        "user_json": user,
+        "actual_page": 'following'
     })

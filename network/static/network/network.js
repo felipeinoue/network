@@ -1,6 +1,6 @@
-let Fpage = 1;
-
 document.addEventListener('DOMContentLoaded', function() {
+
+    const Factual_page = JSON.parse(document.getElementById('actual_page').textContent);
 
     try {
         document.querySelector('#newpost-form').onsubmit = () => {

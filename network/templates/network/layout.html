@@ -44,6 +44,9 @@
           </nav>
         
         <div class="body">
+            {{ user_json|json_script:"user-data" }}
+            {{ actual_page|json_script:"actual_page" }}
+
             {% block body %}
             {% endblock %}
         </div>

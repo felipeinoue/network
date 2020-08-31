@@ -3,13 +3,16 @@ let Fuser_json
 const profile_id = parseInt(document.location.pathname.replace('/profile/', ''))
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    const Factual_page = JSON.parse(document.getElementById('actual_page').textContent);
+
     try {
         document.querySelector('#follow-btn').addEventListener('click', () => follow());
     }
     catch{}
     
     // Default page to be shown
-    load_posts(profile_id, 'profile');
+    load_posts(profile_id, 'profile', Fpage);
     loadFollowbtn(profile_id)
 });
 

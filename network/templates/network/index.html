@@ -16,18 +16,7 @@
 <hr>
 {% endif %}
 
-<div id="posts-view">
-    <p>Posts</p>
-</div>
-
-<div>
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="javascript:pagination(-1);" id="previous">Previous</a></li>
-            <li class="page-item"><a class="page-link" href="javascript:pagination(1);" id="next">Next</a></li>
-        </ul>
-    </nav>
-</div>
+{% include "network/posts.html" %}
 
 {% endblock %}
 
