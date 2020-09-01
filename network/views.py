@@ -141,7 +141,16 @@ def get_posts(request, user_id):
     posts = p.page(request.GET.get("page")).object_list
 
     # Return posts in reverse chronologial order
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    # return JsonResponse([post.serialize() for post in posts], safe=False)
+    return JsonResponse(
+        {
+            "count": 0,
+            "next": "",
+            "previous": "",
+            "total": p.num_pages,
+            "results": [post.serialize() for post in posts]
+        }, 
+        safe=False)
 
 
 def profile(request, user_id):

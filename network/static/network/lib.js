@@ -11,32 +11,43 @@ function load_posts(user_id, Amethod, APage) {
     .then(response => response.json())
     .then(posts => {
   
-      posts.forEach(contents => {
+      posts['results'].forEach(contents => {
         const post = document.createElement('div');
         post.style = 'border: solid; border-width: 0.5px; margin: -0.5px 0px -0.5px 0px;';
         post.className = 'post';
   
-        post.innerHTML = `By: ${contents.owner_name}, ${contents.content}, ` +
-                        `${contents.timestamp}, likes: ${contents.likes}`;
+        post.innerHTML = `<p>By: ${contents.owner_name}</p>` + 
+                        `<p><div>${contents.content}<button class="edit">Edit</button></div></p>` +
+                        `<p>${contents.timestamp}</p>` +
+                        `<p>likes: ${contents.likes}</p>`;
   
         document.querySelector('#posts-view').append(post);
       });
-    })
+      // Check Previous and Next button behavior
+      const total_pages = posts['total'];
+      const element_previous = document.getElementById('previous');
+      const element_next = document.getElementById('next');
+      if (Fpage === 1) {
+        element_previous.parentElement.className = 'page-item disabled';;
+      } else {
+        element_previous.parentElement.className = 'page-item';;
+      }
+      if (Fpage < total_pages) {
+        element_next.parentElement.className = 'page-item';;
+      } else {
+        element_next.parentElement.className = 'page-item disabled';;
+      }
 
-    // Check Previous and Next button behavior
-    const element_previous = document.getElementById('previous');
-    const element_next = document.getElementById('next');
-    if (Fpage === 1) {
-      element_previous.parentElement.className = 'page-item disabled';;
-    } else {
-      element_previous.parentElement.className = 'page-item';;
-    }
-    if (Fpage < 2) {
-      element_next.parentElement.className = 'page-item';;
-    } else {
-      element_next.parentElement.className = 'page-item disabled';;
-    }
+    })
 }
+
+// If hide button is clicked, delete the post
+document.addEventListener('click', event => {
+  const element = event.target;
+  if (element.className === 'edit') {
+    element.parentElement.remove();
+  }
+});
 
 function pagination(Anum) {
   clean_posts();
