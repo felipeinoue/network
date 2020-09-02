@@ -19,23 +19,3 @@ document.addEventListener('DOMContentLoaded', function() {
     load_posts(1, 'all', Fpage);
 });
 
-function post(data) {
-
-    const csrftoken = getCookie('csrftoken');
-
-    fetch('/posts', {
-        method: 'POST',
-        mode: 'same-origin',  // Do not send CSRF token to another domain.
-        headers: {
-            'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({
-            content: data.value
-        })
-    })
-    .then(response => response.json())
-    .then(result => {
-        // Print result
-        console.log(result);
-    }) 
-}

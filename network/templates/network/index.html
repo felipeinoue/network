@@ -5,7 +5,7 @@
 
 {% if user.is_authenticated %}
 <form id="newpost-form">
-    {% csrf_token %}
+    <!-- {% csrf_token %} -->
     <div class="form-group">
         <p>New Post</p>
         <textarea class="form-control" id="newpost-content" rows="3"></textarea>

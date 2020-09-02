@@ -1,3 +1,4 @@
+var $ = document.getElementById; //freedom from document.getElementById!
 let Fpage = 1;
 
 function load_posts(user_id, Amethod, APage) {
@@ -17,7 +18,7 @@ function load_posts(user_id, Amethod, APage) {
         post.className = 'post';
   
         post.innerHTML = `<p>By: ${contents.owner_name}</p>` + 
-                        `<p><div>${contents.content}<button class="edit">Edit</button></div></p>` +
+                        `<p><div><div>${contents.content}</div><button class="edit">Edit</button></div></p>` +
                         `<p>${contents.timestamp}</p>` +
                         `<p>likes: ${contents.likes}</p>`;
   
@@ -41,12 +42,30 @@ function load_posts(user_id, Amethod, APage) {
     })
 }
 
-// If hide button is clicked, delete the post
+// Evaluate button click
 document.addEventListener('click', event => {
   const element = event.target;
+  // if click is class edit
   if (element.className === 'edit') {
-    element.parentElement.remove();
+    element.parentElement.childNodes[0].style.display = "none";
+    element.style.display = "none";
+
+    const content = element.parentElement.childNodes[0].textContent;
+
+    const editpost = document.createElement('div');
+    editpost.innerHTML = 
+                        `<textarea class="form-control" rows="3">${content}</textarea>`+
+                        `<button class="save_edit">Save</button>`;
+
+    element.parentElement.appendChild(editpost);
   }
+
+  // if click is class save_edit
+  if (element.className === 'save_edit') {
+    const data = element.parentElement.childNodes[0]
+    post(data);
+  }
+
 });
 
 function pagination(Anum) {
@@ -80,4 +99,25 @@ function getCookie(name) {
       }
   }
   return cookieValue;
+}
+
+function post(data) {
+
+  const csrftoken = getCookie('csrftoken');
+
+  fetch('/posts', {
+      method: 'POST',
+      mode: 'same-origin',  // Do not send CSRF token to another domain.
+      headers: {
+          'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({
+          content: data.value
+      })
+  })
+  .then(response => response.json())
+  .then(result => {
+      // Print result
+      console.log(result);
+  }) 
 }
