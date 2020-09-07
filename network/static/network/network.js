@@ -17,5 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Default page to be shown
     load_posts(1, 'all', Fpage);
+
 });
 

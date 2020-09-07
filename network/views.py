@@ -12,11 +12,14 @@ from .models import User, Follow, Like, Post
 
 
 def index(request):
-    user = User.objects.get(pk=request.user.id).serialize()
-    return render(request, "network/index.html", {
-        "user_json": user,
-        "actual_page": 'all'
-    })
+    try:
+        user = User.objects.get(pk=request.user.id).serialize()
+        return render(request, "network/index.html", {
+            "user_json": user,
+            "actual_page": 'all'
+        })
+    except:
+        return render(request, "network/index.html")
 
 
 def login_view(request):
@@ -98,6 +101,30 @@ def newpost(request):
 
 
 @login_required
+def api_update_post(request, post_id):
+
+    # Update a post must be via PUT
+    if request.method != "PUT":
+        return JsonResponse({"error": "PUT request required."}, status=400)
+
+    # Query for requested post
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post not found."}, status=404)
+
+    # Check if user is the owner of the post
+    if post.owner.id != request.user.id:
+        return JsonResponse({"error": "Cannot edit. User is not the owner of this post."}, status=403)
+
+    # Update post
+    data = json.loads(request.body)
+    post.content = data["content"]
+    post.save()
+    return JsonResponse({"message": "Post updated successfully."}, status=201)
+
+
+@login_required
 def post(request, post_id):
 
     # Query for requested post
@@ -136,12 +163,11 @@ def get_posts(request, user_id):
     else:
         return JsonResponse({"error": "Invalid user id."}, status=400)
 
+    # Return posts in reverse chronologial order
     objects = objects.order_by("-timestamp").all()
     p = Paginator(objects, 10)
     posts = p.page(request.GET.get("page")).object_list
 
-    # Return posts in reverse chronologial order
-    # return JsonResponse([post.serialize() for post in posts], safe=False)
     return JsonResponse(
         {
             "count": 0,

@@ -17,8 +17,22 @@ function load_posts(user_id, Amethod, APage) {
         post.style = 'border: solid; border-width: 0.5px; margin: -0.5px 0px -0.5px 0px;';
         post.className = 'post';
   
+        const user_json = JSON.parse(document.getElementById('user-data').textContent);
+        let edit_button = "";
+        if (user_json['id'] === contents.owner_id) {
+          edit_button = `<button class="edit">Edit</button>`+
+          `<textarea style="display: none;" class="form-control" rows="3">${contents.content}</textarea>`+
+          `<button style="display: none;" class="save_edit" data-value="${contents.id}">Save</button>`;
+        }
+
         post.innerHTML = `<p>By: ${contents.owner_name}</p>` + 
-                        `<p><div><div>${contents.content}</div><button class="edit">Edit</button></div></p>` +
+                        `<p><div>`+
+                          `<div>${contents.content}</div>`+
+                          `${edit_button}`+
+                          // `<button class="edit">Edit</button>`+
+                          // `<textarea style="display: none;" class="form-control" rows="3">${contents.content}</textarea>`+
+                          // `<button style="display: none;" class="save_edit" data-value="${contents.id}">Save</button>`+
+                        `</div></p>` +
                         `<p>${contents.timestamp}</p>` +
                         `<p>likes: ${contents.likes}</p>`;
   
@@ -42,28 +56,28 @@ function load_posts(user_id, Amethod, APage) {
     })
 }
 
+
 // Evaluate button click
 document.addEventListener('click', event => {
   const element = event.target;
   // if click is class edit
   if (element.className === 'edit') {
-    element.parentElement.childNodes[0].style.display = "none";
-    element.style.display = "none";
 
-    const content = element.parentElement.childNodes[0].textContent;
+    // Hide
+    element.parentElement.childNodes[0].style.display = "none"; //div
+    element.style.display = "none"; //edit button
 
-    const editpost = document.createElement('div');
-    editpost.innerHTML = 
-                        `<textarea class="form-control" rows="3">${content}</textarea>`+
-                        `<button class="save_edit">Save</button>`;
+    // Show
+    element.parentElement.childNodes[2].style.display = "block"; //textarea
+    element.parentElement.childNodes[3].style.display = "block"; //save button
 
-    element.parentElement.appendChild(editpost);
   }
 
   // if click is class save_edit
   if (element.className === 'save_edit') {
-    const data = element.parentElement.childNodes[0]
-    post(data);
+    const post_id = parseInt(element.dataset.value);
+    const data = element.parentElement.childNodes[2];
+    update_post(data, post_id);
   }
 
 });
@@ -119,5 +133,28 @@ function post(data) {
   .then(result => {
       // Print result
       console.log(result);
+  }) 
+}
+
+function update_post(data, post_id) {
+
+  const csrftoken = getCookie('csrftoken');
+
+  fetch(`/api_update_post/${post_id}`, {
+      method: 'PUT',
+      mode: 'same-origin',  // Do not send CSRF token to another domain.
+      headers: {
+          'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({
+          content: data.value
+          // content: data
+      })
+  })
+  .then(response => response.json())
+  .then(result => {
+      // Print result
+      console.log(result);
+      pagination(0);
   }) 
 }
