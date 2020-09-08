@@ -1,4 +1,3 @@
-var $ = document.getElementById; //freedom from document.getElementById!
 let Fpage = 1;
 
 function load_posts(user_id, Amethod, APage) {
@@ -29,12 +28,12 @@ function load_posts(user_id, Amethod, APage) {
                         `<p><div>`+
                           `<div>${contents.content}</div>`+
                           `${edit_button}`+
-                          // `<button class="edit">Edit</button>`+
-                          // `<textarea style="display: none;" class="form-control" rows="3">${contents.content}</textarea>`+
-                          // `<button style="display: none;" class="save_edit" data-value="${contents.id}">Save</button>`+
                         `</div></p>` +
                         `<p>${contents.timestamp}</p>` +
-                        `<p>likes: ${contents.likes}</p>`;
+                        `<div>`+
+                          `<div id="post_like${contents.id}">likes: ${contents.likes}</div>`+
+                          `<button class="like_button" data-value="${contents.id}">Like!</button>`+
+                        `</div>`;
   
         document.querySelector('#posts-view').append(post);
       });
@@ -60,6 +59,7 @@ function load_posts(user_id, Amethod, APage) {
 // Evaluate button click
 document.addEventListener('click', event => {
   const element = event.target;
+
   // if click is class edit
   if (element.className === 'edit') {
 
@@ -80,7 +80,31 @@ document.addEventListener('click', event => {
     update_post(data, post_id);
   }
 
+  // if click is class like_button
+  if (element.className === 'like_button') {
+    loads_like(element);
+  }
 });
+
+function loads_like(element) {
+  const post_id = parseInt(element.dataset.value);
+
+  const csrftoken = getCookie('csrftoken');
+
+  fetch(`/api_like_post/${post_id}`, {
+      method: 'POST',
+      mode: 'same-origin',  // Do not send CSRF token to another domain.
+      headers: {
+          'X-CSRFToken': csrftoken
+      }
+  })
+  .then(response => response.json())
+  .then(result => {
+      // Print result
+      console.log(result);
+      pagination(0);
+  })
+}
 
 function pagination(Anum) {
   clean_posts();

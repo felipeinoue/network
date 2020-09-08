@@ -30,13 +30,15 @@ class Post(models.Model):
 
     def serialize(self):
         likes = Like.objects.filter(post=self.id).count()
+        likes_users = Like.objects.filter(post=self.id)
         return {
             "id": self.id,
             "content": self.content,
             "timestamp": self.timestamp.strftime("%B %d"),
             "owner_id": self.owner.id,
             "owner_name": self.owner.first_name,
-            "likes": likes
+            "likes": likes,
+            "likes_users": [like_user.serialize() for like_user in likes_users]
         }
 
 class Follow(models.Model):
@@ -52,3 +54,8 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} liked the post [{self.post.id}] from {self.post.owner.first_name}"
+
+    def serialize(self):
+        return {
+            "user_id": self.user.id
+        }

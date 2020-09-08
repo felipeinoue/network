@@ -125,6 +125,35 @@ def api_update_post(request, post_id):
 
 
 @login_required
+def api_like_post(request, post_id):
+
+    # Like a post must be via POST
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+        
+    # User should not have liked this post already
+    try:
+        like = Like.objects.get(user=request.user.id, post=post_id)
+        return JsonResponse({"error": "User has already liked this post."}, status=404)
+    except Like.DoesNotExist:
+        pass
+
+    # Check if post exists
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post doesn't exist."}, status=404)
+
+    # Like the post
+    like = Like(
+        user = request.user,
+        post = post
+    )
+    like.save()
+    return JsonResponse({"message": "Like saved successfully."}, status=201)
+
+
+@login_required
 def post(request, post_id):
 
     # Query for requested post
