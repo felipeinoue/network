@@ -34,11 +34,11 @@ class Post(models.Model):
         return {
             "id": self.id,
             "content": self.content,
-            "timestamp": self.timestamp.strftime("%B %d"),
+            "timestamp": self.timestamp.strftime("%B %d of %Y at %X"),
             "owner_id": self.owner.id,
             "owner_name": self.owner.first_name,
             "likes": likes,
-            "likes_users": [like_user.serialize() for like_user in likes_users]
+            "likes_users": [like_user.all_likes() for like_user in likes_users]
         }
 
 class Follow(models.Model):
@@ -55,7 +55,5 @@ class Like(models.Model):
     def __str__(self):
         return f"{self.user.first_name} liked the post [{self.post.id}] from {self.post.owner.first_name}"
 
-    def serialize(self):
-        return {
-            "user_id": self.user.id
-        }
+    def all_likes(self):
+        return self.user.id

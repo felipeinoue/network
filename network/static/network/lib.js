@@ -24,6 +24,17 @@ function load_posts(user_id, Amethod, APage) {
           `<button style="display: none;" class="save_edit" data-value="${contents.id}">Save</button>`;
         }
 
+        let like_text = "";
+        let like_button = "";
+        if (user_json['id']) {
+          if (contents.likes_users.indexOf(user_json['id']) > -1) {
+            like_text = 'Unlike';
+          } else {
+            like_text = 'Like';
+          }  
+          like_button = `<button class="like_button" data-value="${contents.id}">${like_text}</button>`
+        }
+
         post.innerHTML = `<p>By: ${contents.owner_name}</p>` + 
                         `<p><div>`+
                           `<div>${contents.content}</div>`+
@@ -32,7 +43,7 @@ function load_posts(user_id, Amethod, APage) {
                         `<p>${contents.timestamp}</p>` +
                         `<div>`+
                           `<div id="post_like${contents.id}">likes: ${contents.likes}</div>`+
-                          `<button class="like_button" data-value="${contents.id}">Like!</button>`+
+                          `${like_button}`+
                         `</div>`;
   
         document.querySelector('#posts-view').append(post);
@@ -87,8 +98,8 @@ document.addEventListener('click', event => {
 });
 
 function loads_like(element) {
-  const post_id = parseInt(element.dataset.value);
 
+  const post_id = parseInt(element.dataset.value);
   const csrftoken = getCookie('csrftoken');
 
   fetch(`/api_like_post/${post_id}`, {
@@ -111,8 +122,13 @@ function pagination(Anum) {
 
   Fpage = Fpage + (Anum);
   const actual_page = JSON.parse(document.getElementById('actual_page').textContent);
+  let user_json_id = 1;
   const user_json = JSON.parse(document.getElementById('user-data').textContent);
-  load_posts(user_json['id'], actual_page, Fpage)
+  if (user_json['id'] !== undefined) {
+    user_json_id = user_json['id'];
+  }
+
+  load_posts(user_json_id, actual_page, Fpage)
 }
 
 function clean_posts() {

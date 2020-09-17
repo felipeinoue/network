@@ -19,7 +19,9 @@ def index(request):
             "actual_page": 'all'
         })
     except:
-        return render(request, "network/index.html")
+        return render(request, "network/index.html", {
+            "actual_page": 'all'
+        })
 
 
 def login_view(request):
@@ -134,7 +136,8 @@ def api_like_post(request, post_id):
     # User should not have liked this post already
     try:
         like = Like.objects.get(user=request.user.id, post=post_id)
-        return JsonResponse({"error": "User has already liked this post."}, status=404)
+        like.delete()
+        return JsonResponse({"message": "Like deleted successfully."}, status=201)
     except Like.DoesNotExist:
         pass
 
