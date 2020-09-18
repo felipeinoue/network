@@ -19,31 +19,36 @@ function load_posts(user_id, Amethod, APage) {
         const user_json = JSON.parse(document.getElementById('user-data').textContent);
         let edit_button = "";
         if (user_json['id'] === contents.owner_id) {
-          edit_button = `<button class="edit">Edit</button>`+
+          edit_button = 
+          `<button class="btn btn-outline-primary btn-sm" id="edit${contents.id}">Edit</button>`+
           `<textarea style="display: none;" class="form-control" rows="3">${contents.content}</textarea>`+
-          `<button style="display: none;" class="save_edit" data-value="${contents.id}">Save</button>`;
+          `<button style="display: none;" class="btn btn-outline-primary btn-sm" data-value="${contents.id}" id="save_edit${contents.id}">Save</button>`;
         }
 
-        let like_text = "";
+        let like_active = "";
         let like_button = "";
         if (user_json['id']) {
           if (contents.likes_users.indexOf(user_json['id']) > -1) {
-            like_text = 'Unlike';
-          } else {
-            like_text = 'Like';
-          }  
-          like_button = `<button class="like_button" data-value="${contents.id}">${like_text}</button>`
+            like_active = 'active';
+          } 
+          like_button = `<button class="btn btn-outline-success btn-sm ${like_active}" id="like_button${contents.id}" data-value="${contents.id}">Like!</button>`
+        } else {
+          like_button = `<button class="btn btn-secondary btn-sm" disabled>Like!</button>`
         }
 
-        post.innerHTML = `<p>By: ${contents.owner_name}</p>` + 
-                        `<p><div>`+
-                          `<div>${contents.content}</div>`+
-                          `${edit_button}`+
-                        `</div></p>` +
-                        `<p>${contents.timestamp}</p>` +
-                        `<div>`+
-                          `<div id="post_like${contents.id}">likes: ${contents.likes}</div>`+
-                          `${like_button}`+
+        post.innerHTML = 
+                        `<div class="card">` +
+                          `<div class="card-body">` +
+                            `<p class="card-text">On ${contents.timestamp} <strong>${contents.owner_name}</strong> wrote:</p>` +
+                            `<div>`+
+                              `<h5 class="card-title">${contents.content}</h5>` +
+                              `${edit_button}`+
+                            `</div>`+ 
+                            `<p></p>`+ 
+                            `<div>`+
+                              `<div id="post_like${contents.id}">${like_button}  ${contents.likes}</div>`+
+                            `</div>`+
+                          `</div>` +
                         `</div>`;
   
         document.querySelector('#posts-view').append(post);
@@ -72,7 +77,7 @@ document.addEventListener('click', event => {
   const element = event.target;
 
   // if click is class edit
-  if (element.className === 'edit') {
+  if (element.id.includes("edit")) {
 
     // Hide
     element.parentElement.childNodes[0].style.display = "none"; //div
@@ -85,14 +90,14 @@ document.addEventListener('click', event => {
   }
 
   // if click is class save_edit
-  if (element.className === 'save_edit') {
+  if (element.id.includes("save_edit")) {
     const post_id = parseInt(element.dataset.value);
     const data = element.parentElement.childNodes[2];
     update_post(data, post_id);
   }
 
-  // if click is class like_button
-  if (element.className === 'like_button') {
+  // if click id has like_button
+  if (element.id.includes("like_button")) {
     loads_like(element);
   }
 });
