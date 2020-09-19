@@ -3,14 +3,20 @@
 
 {% block body %}
 
-<div id="name-view">
-    <p>This is the Profile Page of {{ first_name }}</p>
-    <p>Following: {{ following_count }}</p>
-    <p>Followers: {{ followers_count }}</p>
-    {% if user.is_authenticated %}
-    <button id="follow-btn"></button>
-    {% endif %}
+<div class="card text-center">
+    <div class="card-body text-white bg-dark">
+        <h2 class="card-title">Welcome to {{ first_name }}'s page.</h2>
+    </div>
+    <div class="card-footer text-muted">
+        <p class="text-left">Following: {{ following_count }}</p>
+        <p class="text-left">Followers: {{ followers_count }}</p>
+        {% if user.is_authenticated %}
+        <button class="btn btn-dark btn-sm" id="follow-btn"></button>
+        {% endif %}
+    </div>
 </div>
+
+<hr>
 
 {% include "network/posts.html" %}
 

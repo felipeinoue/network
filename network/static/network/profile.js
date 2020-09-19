@@ -4,6 +4,8 @@ const profile_id = parseInt(document.location.pathname.replace('/profile/', ''))
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    document.getElementById('nav_profile').className =      'btn btn-sm btn-outline-light active';
+
     const Factual_page = JSON.parse(document.getElementById('actual_page').textContent);
 
     try {

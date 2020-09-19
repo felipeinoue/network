@@ -13,7 +13,7 @@ function load_posts(user_id, Amethod, APage) {
   
       posts['results'].forEach(contents => {
         const post = document.createElement('div');
-        post.style = 'border: solid; border-width: 0.5px; margin: -0.5px 0px -0.5px 0px;';
+        post.style = 'border: none; border-width: 0.5px; margin: -0.5px 0px -0.5px 0px;';
         post.className = 'post';
   
         const user_json = JSON.parse(document.getElementById('user-data').textContent);
@@ -49,7 +49,8 @@ function load_posts(user_id, Amethod, APage) {
                               `<div id="post_like${contents.id}">${like_button}  ${contents.likes}</div>`+
                             `</div>`+
                           `</div>` +
-                        `</div>`;
+                        `</div>`+
+                        `<br>`;
   
         document.querySelector('#posts-view').append(post);
       });
